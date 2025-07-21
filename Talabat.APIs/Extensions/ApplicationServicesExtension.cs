@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Helpers;
 using Talabat.APIs.Middlewares;
 using Talabat.Core.Repositories.Contract;
-using Talabat.Repository;
+using Talabat.Infrastructure.Basket_Repository;
+using Talabat.Infrastructure.Generic_Repository;
 
 namespace Talabat.APIs.Extensions
 {
@@ -23,6 +25,7 @@ namespace Talabat.APIs.Extensions
                 };
                 return new BadRequestObjectResult(response);
             });
+            services.AddScoped(typeof(IBasketRepository), typeof(BasketRepository));
             services.AddTransient<ExceptionMiddleware>();
             return services;
         }

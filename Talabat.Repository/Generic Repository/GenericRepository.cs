@@ -7,10 +7,10 @@ using Microsoft.EntityFrameworkCore;
 using Talabat.Core.Entities;
 using Talabat.Core.Repositories.Contract;
 using Talabat.Core.Specifications;
-using Talabat.Infrastructure;
-using Talabat.Repository.Data;
+using Talabat.Infrastructure.Generic_Repository.Data;
 
-namespace Talabat.Repository
+
+namespace Talabat.Infrastructure.Generic_Repository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Talabat.Core.Entities;
 
-namespace Talabat.Repository.Data.Config
+namespace Talabat.Infrastructure.Generic_Repository.Data.Config
 {
     internal class ProductConfigurations : IEntityTypeConfiguration<Product>
     {

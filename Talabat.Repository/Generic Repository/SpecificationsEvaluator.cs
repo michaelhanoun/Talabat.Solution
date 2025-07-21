@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Talabat.Core.Entities;
 using Talabat.Core.Specifications;
 
-namespace Talabat.Infrastructure
+namespace Talabat.Infrastructure.Generic_Repository
 {
     public static class SpecificationsEvaluator<TEntity> where TEntity : BaseEntity
     {

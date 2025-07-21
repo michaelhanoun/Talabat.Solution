@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Talabat.Core.Entities;
 
-namespace Talabat.Repository.Data
+namespace Talabat.Infrastructure.Generic_Repository.Data
 {
     public class StoreContextSeed
     {

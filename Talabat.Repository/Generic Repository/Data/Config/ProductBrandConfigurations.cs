@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Talabat.Core.Entities;
 
-namespace Talabat.Repository.Data.Config
+namespace Talabat.Infrastructure.Generic_Repository.Data.Config
 {
     internal class ProductBrandConfigurations : IEntityTypeConfiguration<ProductBrand>
     {
