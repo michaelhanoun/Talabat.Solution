@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Talabat.APIs.Dtos;
-using Talabat.Core.Entities;
+using Talabat.Core.Entities.Product;
 
 namespace Talabat.APIs.Helpers
 {

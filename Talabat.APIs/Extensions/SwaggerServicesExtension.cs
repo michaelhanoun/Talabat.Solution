@@ -4,7 +4,10 @@
     {
         public static IServiceCollection AddSwaggerServices(this IServiceCollection services) {
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(c =>
+            {
+                c.CustomSchemaIds(type => type.FullName);
+            }) ;
             return services;   
         }
         public static WebApplication UseSwaggerMiddleware(this WebApplication app)

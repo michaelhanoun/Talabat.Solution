@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using Talabat.APIs.Dtos;
-using Talabat.Core.Entities;
-using static System.Net.WebRequestMethods;
+using Talabat.Core.Entities.Basket;
+using Talabat.Core.Entities.Identity;
+using Talabat.Core.Entities.Order_Aggregate;
+using Talabat.Core.Entities.Product;
+
 
 namespace Talabat.APIs.Helpers
 {
@@ -16,6 +19,14 @@ namespace Talabat.APIs.Helpers
                 .ForMember(P => P.PictureUrl, O => O.MapFrom<ProductPictureUrlResolver>());
             CreateMap<CustomerBasketDto, CustomerBasket>();
             CreateMap<BasketItemDto, BasketItem>();
+            CreateMap<Talabat.Core.Entities.Identity.Address, AddressDto>().ReverseMap();
+            CreateMap<AddressDto, Talabat.Core.Entities.Order_Aggregate.Address>();
+            CreateMap<Order, OrderToReturnDto>().ForMember(d => d.DeliveryMethod, O => O.MapFrom(o => o.DeliveryMethod.ShortName))
+                                               .ForMember(d => d.DeliveryMethodCost, O => O.MapFrom(o => o.DeliveryMethod.Cost));
+            CreateMap<OrderItem, OrderItemDto>().ForMember(d => d.ProductName, O => O.MapFrom(o => o.Product.ProductName))
+                                               .ForMember(d => d.ProductId, O => O.MapFrom(o => o.Product.ProductId))
+                                               .ForMember(d => d.ProductUrl, O => O.MapFrom<OrderItemPictureUrlResolver>());
+                                                               
         }
     }
 }

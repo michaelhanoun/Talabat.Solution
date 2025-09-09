@@ -1,7 +1,12 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using StackExchange.Redis;
 using Talabat.APIs.Extensions;
-using Talabat.Infrastructure.Generic_Repository.Data;
+using Talabat.Core.Entities.Identity;
+using Talabat.Infrastructure._Identinty;
+using Talabat.Infrastructure._Identity;
+using Talabat.Infrastructure.Data;
 
 namespace Talabat.APIs
 {
@@ -14,12 +19,15 @@ namespace Talabat.APIs
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddNewtonsoftJson(options =>{ options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore; });
+            builder.Services.AddCors(options => options.AddPolicy("MyPolicy", policyOptions => { policyOptions.AllowAnyHeader().AllowAnyMethod().WithOrigins(builder.Configuration["FrontBaseUrl"]); }));
             builder.Services.AddDbContext<StoreContext>(options=>options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddScoped<IConnectionMultiplexer>((serviceprovider) => {
+            builder.Services.AddDbContext<ApplicationIdentityDbContext>(options =>options.UseSqlServer(builder.Configuration.GetConnectionString("IdenetityConnection")));
+            builder.Services.AddSingleton<IConnectionMultiplexer>((serviceprovider) => {
                 return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis"));
             });
             builder.Services.AddApplicationServicres();
+            builder.Services.AddAuthService(builder.Configuration);
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
            builder.Services.AddSwaggerServices();
 
@@ -30,6 +38,7 @@ namespace Talabat.APIs
             var services = scope.ServiceProvider;
 
             StoreContext storeContext = services.GetRequiredService<StoreContext>();
+            ApplicationIdentityDbContext applicationIdentityDbContext = services.GetRequiredService<ApplicationIdentityDbContext>();
 
             var loggerFactory = services.GetRequiredService<ILoggerFactory>();
 
@@ -38,6 +47,9 @@ namespace Talabat.APIs
             {
                 await storeContext.Database.MigrateAsync();
                 await StoreContextSeed.SeedAsync(storeContext);
+                await applicationIdentityDbContext.Database.MigrateAsync();
+                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                await ApplicationIdentityDataSeed.SeedUsersAsync(userManager);
             }
             catch (Exception ex)
             {
@@ -78,6 +90,8 @@ namespace Talabat.APIs
             app.UseStatusCodePagesWithReExecute ("/errors/{0}");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseCors("MyPolicy");
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

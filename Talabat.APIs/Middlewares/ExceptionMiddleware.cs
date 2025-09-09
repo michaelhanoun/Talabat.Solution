@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
 using Talabat.APIs.Errors;
 
 namespace Talabat.APIs.Middlewares

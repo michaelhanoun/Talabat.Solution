@@ -1,4 +1,4 @@
-﻿using Talabat.Core.Entities;
+﻿
 
 namespace Talabat.APIs.Dtos
 {
