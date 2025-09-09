@@ -1,4 +1,4 @@
-# Talabat.Solution — Food Delivery Backend (ASP.NET Core 8)
+# Talabat.Solution (ASP.NET Core 8)
 
 A production-style backend for a Talabat-like food delivery system. It showcases clean architecture, JWT auth + Google OAuth, Redis-backed caching, Stripe payments, SMTP email, and a specification-driven data access layer.
 
