@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using Talabat.APIs.Extensions;
+using Talabat.APIs.Middlewares;
 using Talabat.Core.Entities.Identity;
 using Talabat.Infrastructure._Identinty;
 using Talabat.Infrastructure._Identity;
@@ -87,6 +88,7 @@ namespace Talabat.APIs
                 app.UseSwaggerMiddleware();
                
             }
+            app.UseMiddleware<ExceptionMiddleware>();
             app.UseStatusCodePagesWithReExecute ("/errors/{0}");
             app.UseHttpsRedirection();
             app.UseStaticFiles();
