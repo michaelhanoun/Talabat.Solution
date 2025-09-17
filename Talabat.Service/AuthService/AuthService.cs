@@ -24,6 +24,7 @@ namespace Talabat.Application.AuthService
             {
                 new Claim(ClaimTypes.Name,user.DisplayName),
                 new Claim(ClaimTypes.Email,user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
             var userRoles = await userManager.GetRolesAsync(user);
             foreach (var role in userRoles)
