@@ -64,7 +64,7 @@ Talabat.Solution/
     ├─ AuthService/        # JWT token factory
     └─ Cache Service/      # Redis-backed response cache
 
-
+```
 ---
 
 ## 🗝️ Key Endpoints (examples)
