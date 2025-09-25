@@ -26,43 +26,45 @@ A production-style backend for a Talabat-like food delivery system. It showcases
 
 ## 🧱 Solution Structure
 
+```text
 Talabat.Solution/
-├─ Talabat.APIs/ # API layer (controllers, DTOs, middleware, Swagger)
-│ ├─ Controllers/
-│ │ ├─ AccountController.cs # Register, Login, External Login, Current User, Address, Forgot/Reset Password
-│ │ ├─ ProductsController.cs # Products, Brands, Categories (+ [Cached])
-│ │ ├─ BasketController.cs # Basket CRUD (Redis)
-│ │ ├─ OrdersController.cs # Create/Get orders, delivery methods (JWT [Authorize])
-│ │ └─ PaymentController.cs # Stripe PaymentIntent + webhook
-│ ├─ Dtos/
-│ ├─ Extensions/ # Add*Services, Swagger, UserManager helpers
-│ ├─ Helpers/ # MappingProfile, CachedAttribute, Url resolvers
-│ ├─ Middlewares/ # ExceptionMiddleware
-│ └─ wwwroot/images/products/ # Static product images
-│
-├─ Talabat.Core/ # Domain & contracts
-│ ├─ Entities/
-│ │ ├─ Product (Brand/Category/Product)
-│ │ ├─ Basket (CustomerBasket, BasketItem)
-│ │ ├─ Order_Aggregate (Order, OrderItem, DeliveryMethod, Address, OrderStatus)
-│ │ └─ Identity (ApplicationUser, Address)
-│ ├─ Specifications/ # Base + Product & Order specs, params & pagination
-│ └─ Services.Contract/ # IProductService, IOrderService, IPaymentService, IAuthService, IResponseCacheService, ISendEmail, etc.
-│
-├─ Talabat.Repository/ # Infrastructure: EF Core, Migrations, Seeding
-│ ├─ _Data/ # StoreContext, configurations, seeding (brands/categories/products/delivery)
-│ ├─ _Identity/ # Identity DbContext + user seed
-│ ├─ Generic Repository/ # GenericRepository, SpecificationsEvaluator
-│ ├─ Basket Repository/ # IBasketRepository → Redis
-│ └─ UnitOfWork.cs
-│
-└─ Talabat.Service/ # Application services
-├─ Product Service/ # Filtering, sorting, paging via specifications
-├─ Order Service/ # Create order from basket, delivery, totals
-├─ Payment Service/ # Stripe PaymentIntent, webhook status updates
-├─ AuthService/ # JWT token factory
-└─ Cache Service/ # Redis-backed response cache
+ ├─ Talabat.APIs/   # API layer (controllers, DTOs, middleware, Swagger)
+ │  ├─ Controllers/
+ │  │   ├─ AccountController.cs   # Register, Login, External Login, Current User, Address, Forgot/Reset Password
+ │  │   ├─ ProductsController.cs  # Products, Brands, Categories (+ [Cached])
+ │  │   ├─ BasketController.cs    # Basket CRUD (Redis)
+ │  │   ├─ OrdersController.cs    # Create/Get orders, delivery methods (JWT [Authorize])
+ │  │   └─ PaymentController.cs   # Stripe PaymentIntent + webhook
+ │  ├─ Dtos/
+ │  ├─ Extensions/    # Add*Services, Swagger, UserManager helpers
+ │  ├─ Helpers/       # MappingProfile, CachedAttribute, Url resolvers
+ │  ├─ Middlewares/   # ExceptionMiddleware
+ │  └─ wwwroot/images/products/   # Static product images
+ │
+ ├─ Talabat.Core/     # Domain & contracts
+ │  ├─ Entities/
+ │  │   ├─ Product (Brand/Category/Product)
+ │  │   ├─ Basket (CustomerBasket, BasketItem)
+ │  │   ├─ Order_Aggregate (Order, OrderItem, DeliveryMethod, Address, OrderStatus)
+ │  │   └─ Identity (ApplicationUser, Address)
+ │  ├─ Specifications/     # Base + Product & Order specs, params & pagination
+ │  └─ Services.Contract/  # IProductService, IOrderService, IPaymentService, IAuthService, IResponseCacheService, ISendEmail, etc.
+ │
+ ├─ Talabat.Repository/    # Infrastructure: EF Core, Migrations, Seeding
+ │  ├─ _Data/              # StoreContext, configurations, seeding (brands/categories/products/delivery)
+ │  ├─ _Identity/          # Identity DbContext + user seed
+ │  ├─ Generic Repository/ # GenericRepository, SpecificationsEvaluator
+ │  ├─ Basket Repository/  # IBasketRepository → Redis
+ │  └─ UnitOfWork.cs
+ │
+ └─ Talabat.Service/       # Application services
+    ├─ Product Service/    # Filtering, sorting, paging via specifications
+    ├─ Order Service/      # Create order from basket, delivery, totals
+    ├─ Payment Service/    # Stripe PaymentIntent, webhook status updates
+    ├─ AuthService/        # JWT token factory
+    └─ Cache Service/      # Redis-backed response cache
 
+```
 ---
 
 ## 🗝️ Key Endpoints (examples)
