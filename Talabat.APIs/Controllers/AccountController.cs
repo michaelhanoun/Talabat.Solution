@@ -4,11 +4,13 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using Talabat.APIs.Dtos;
 using Talabat.APIs.Errors;
 using Talabat.APIs.Extensions;
 using Talabat.Core.Entities.Identity;
+using Talabat.Core.Models;
 using Talabat.Core.Services.Contract;
 
 namespace Talabat.APIs.Controllers
@@ -43,7 +45,17 @@ namespace Talabat.APIs.Controllers
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (!result.Succeeded)
                 return Unauthorized(new ApiResponse(401, "Invalid Login"));
-            return Ok(new UserDto() { DisplayName = user.DisplayName, Email = user.Email, Token = await _authService.CreateTokenAsync(user, _userManager) });
+            var auth = await _authService.AddRefreshTokenToUser(user.Id);
+            if(auth is null)
+                return Unauthorized(new ApiResponse(401, "Could not issue tokens"));
+            Response.Cookies.Append("refreshToken", auth.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = auth.ExpireOfRefreshToken
+            });
+            return Ok(new UserDto() { DisplayName = user.DisplayName, Email = user.Email, JwtToken = auth.JwtToken,RefreshToken = auth.RefreshToken });
         }
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto model)
@@ -58,20 +70,30 @@ namespace Talabat.APIs.Controllers
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
                 return BadRequest(new ApiValidationErrorResponse() { Errors = result.Errors.Select(E => E.Description) });
-            return Ok(new UserDto() { DisplayName = user.DisplayName, Email = user.Email, Token = await _authService.CreateTokenAsync(user, _userManager) });
+            var auth = await _authService.AddRefreshTokenToUser(user.Id);
+            if (auth is null)
+                return Unauthorized(new ApiResponse(401, "Could not issue tokens"));
+            Response.Cookies.Append("refreshToken", auth.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = auth.ExpireOfRefreshToken
+            });
+            return Ok(new UserDto() { DisplayName = user.DisplayName, Email = user.Email, JwtToken = auth.JwtToken,RefreshToken = auth.RefreshToken });
         }
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<UserDto>> GetCurrentUser()
+        public async Task<ActionResult<MeDto>> GetCurrentUser()
         {
             var email = User.FindFirstValue(ClaimTypes.Email)??string.Empty;
 
             var user =await _userManager.FindByEmailAsync(email);
-            return Ok(new UserDto()
+            return Ok(new MeDto ()
             {
                 DisplayName = user?.DisplayName??string.Empty,
                 Email = user?.Email??string.Empty,
-                Token = await _authService.CreateTokenAsync(user,_userManager)
+                Token = await _authService.CreateTokenAsync(user)
             });
         }
         [Authorize]
@@ -172,8 +194,48 @@ namespace Talabat.APIs.Controllers
                 { return BadRequest(new ApiValidationErrorResponse() { Errors = createResult.Errors.Select(E => E.Description) }); }
                 await _userManager.AddLoginAsync(user, info);
             }
-            var token = await _authService.CreateTokenAsync(user, _userManager);
-            return Ok(new UserDto() { DisplayName = user.DisplayName, Email = user.Email, Token = token });
+            var auth = await _authService.AddRefreshTokenToUser(user.Id);
+            if (auth is null)
+                return Unauthorized(new ApiResponse(401, "Could not issue tokens"));
+            Response.Cookies.Append("refreshToken", auth.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = auth.ExpireOfRefreshToken
+            });
+            return Ok(new UserDto() { DisplayName = user.DisplayName, Email = user.Email, JwtToken = auth.JwtToken, RefreshToken = auth.RefreshToken });
         }
+        [HttpPost("refresh")]
+        public async Task<ActionResult<AuthResponse>> Refresh([FromBody] string refreshToken)
+        {
+            var auth = await _authService.RefreshAsync(refreshToken);
+            if (auth is null) return Unauthorized(new ApiResponse(401, "Could not issue tokens"));
+            
+            return Ok(auth);
+        }
+        [Authorize]
+        [HttpPost("revoke")]
+        public async Task<IActionResult> Revoke([FromBody] string refreshToken)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user is null) return Unauthorized(new ApiResponse(401));
+            var success = await _authService.Revoke(refreshToken, userId); 
+            if (!success) return BadRequest(new ApiResponse(400, "Could not revoke token"));
+            return NoContent();
+        }
+        [Authorize]
+        [HttpPost("revoke-all")]
+        public async Task<IActionResult> RevokeAll()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.Users.Include(U=>U.RefreshTokens).FirstOrDefaultAsync(U=>U.Id==userId);
+            if (user is null) return Unauthorized(new ApiResponse(401));
+            var success = await _authService.RevokeAllTokensForUser(user);
+            if (!success) return BadRequest(new ApiResponse(400, "Could not revoke tokens"));
+            return NoContent();
+        }
+
     }
 }

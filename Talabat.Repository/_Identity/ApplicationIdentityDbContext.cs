@@ -7,6 +7,7 @@ namespace Talabat.Infrastructure._Identinty
     public class ApplicationIdentityDbContext : IdentityDbContext<ApplicationUser>
     {
         public DbSet<Address> Addresses { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         public ApplicationIdentityDbContext(DbContextOptions<ApplicationIdentityDbContext>options):base(options)
         {
             
