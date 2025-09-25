@@ -100,7 +100,7 @@ namespace Talabat.Application.AuthService
         }
         public string HashToken(string token)
         {
-            var keyBytes = Encoding.UTF8.GetBytes(_configuration["JWT:AuthKey"]??"");
+            var keyBytes = Encoding.UTF8.GetBytes(_configuration["Refresh:AuthKey"] ??"");
             using var hmac = new HMACSHA256(keyBytes);
             var tokenBytes = Encoding.UTF8.GetBytes(token);
             var hashBytes = hmac.ComputeHash(tokenBytes);
