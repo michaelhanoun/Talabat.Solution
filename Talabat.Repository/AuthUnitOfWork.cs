@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage;
 using Talabat.Core;
 using Talabat.Core.Entities;
 using Talabat.Core.Repositories.Contract;
@@ -22,6 +23,12 @@ namespace Talabat.Infrastructure
             _repositories = new Hashtable();
             _context = context;
         }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
+
         public async Task<int> CompleteAsync()
         {
             return await _context.SaveChangesAsync();

@@ -129,10 +129,14 @@ namespace Talabat.Application.AuthService
             newRefreshToken.Token = HashToken(token);
             newRefreshToken.ApplicationUserId = oldToken.ApplicationUserId;
             oldToken.ReplacedByToken = newRefreshToken.Token;
+            using var transaction = await _unitOfWork.BeginTransactionAsync();
             await repo.Add(newRefreshToken);
             repo.Update(oldToken);
             var count = await _unitOfWork.CompleteAsync();
-            if (count <= 0) return null;
+            if (count < 2) { 
+                await transaction.RollbackAsync();    
+                return null; }
+            await transaction.CommitAsync();
             return token;
         }
 
